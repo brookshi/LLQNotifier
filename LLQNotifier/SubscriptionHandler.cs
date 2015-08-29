@@ -21,7 +21,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LLQNotifier
+namespace LLQ
 {
     public class SubscriptionHandler
     {
@@ -35,7 +35,7 @@ namespace LLQNotifier
                 if (methodInfo.IsDefined(typeof(SubscriberCallbackAttribute)))
                 {
                     var attr = methodInfo.GetCustomAttribute<SubscriberCallbackAttribute>(true);
-                    var callback = (Action)methodInfo.CreateDelegate(typeof(Action));
+                    var callback = (Action)methodInfo.CreateDelegate(typeof(Action), subscriber);
                     subscriptionList.Add(new Subscription(subscriber, callback, attr.EventType, attr.Priority));
                 }
             }

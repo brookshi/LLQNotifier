@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LLQ;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -25,6 +26,15 @@ namespace Sample
         public MainPage()
         {
             this.InitializeComponent();
+            subscriber1 subscriber1 = new subscriber1();
+            subscriber2 subscriber2 = new subscriber2();
+            Loaded += MainPage_Loaded;
+        }
+
+        private void MainPage_Loaded(object sender, RoutedEventArgs e)
+        {
+            LLQNotifier.Default.Post(new Event1() { Flag = "flag1" });
+            LLQNotifier.Default.Post(new Event2() { Flag = "flag2" });
         }
     }
 }

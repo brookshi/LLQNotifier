@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LLQNotifier
+namespace LLQ
 {
     public class LLQNotifier
     {
@@ -38,7 +38,7 @@ namespace LLQNotifier
             var subscriptionsOfType = _subscriptionDictByType[eventObj.GetType()];
             foreach(var subscription in subscriptionsOfType)
             {
-                subscription.Callback();
+                subscription.Callback();//TODO:call with param
             }
         }
     }

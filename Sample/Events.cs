@@ -20,21 +20,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LLQ
+namespace Sample
 {
-    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
-    public class SubscriberCallbackAttribute : Attribute
+    public class Event1
     {
-        const int DEFAULT_PRIORITY = 3;
+        public string Flag { get; set; }
+    }
 
-        public SubscriberCallbackAttribute(Type eventType, int priority = DEFAULT_PRIORITY)
-        {
-            EventType = eventType;
-            Priority = priority;
-        }
-
-        public Type EventType { get; set; }
-
-        public int Priority { get; set; }
+    public class Event2
+    {
+        public string Flag { get; set; }
     }
 }
