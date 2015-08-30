@@ -30,20 +30,42 @@ namespace LLQ
 
         public bool IsSubscriberAlive { get { return _subscriber.IsAlive; } }
 
-        private Action _callback;
-        public Action Callback { get { return _callback; } }
-
         private Type _eventType;
         public Type EventType { get { return _eventType; } }
 
         private int _priority;
         public int Priority { get { return _priority; } }
 
+        private Action _callback;
+        public Action<object> _callbackWithParam;
+
+        public void ExecCallback(object param)
+        {
+            if (!IsSubscriberAlive)
+                return;
+
+            if(_callback != null)
+            {
+                _callback();
+            }
+            else if(_callbackWithParam != null)
+            {
+                _callbackWithParam(param);
+            }
+        }
 
         public Subscription(object subscriber, Action callback, Type eventType, int priority)
         {
             _subscriber = new WeakReference(subscriber);
             _callback = callback;
+            _priority = priority;
+            _eventType = eventType;
+        }
+
+        public Subscription(object subscriber, Action<object> callbackWithParam, Type eventType, int priority)
+        {
+            _subscriber = new WeakReference(subscriber);
+            _callbackWithParam = callbackWithParam;
             _priority = priority;
             _eventType = eventType;
         }

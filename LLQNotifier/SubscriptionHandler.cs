@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Linq.Expressions;
 
 namespace LLQ
 {
@@ -32,10 +33,24 @@ namespace LLQ
             var methodInfos = subscriber.GetType().GetMethods();
             foreach (var methodInfo in methodInfos)
             {
-                if (methodInfo.IsDefined(typeof(SubscriberCallbackAttribute)))
+                var paramsInfo = methodInfo.GetParameters();
+                var returnType = methodInfo.ReturnType;
+
+                if (!methodInfo.IsDefined(typeof(SubscriberCallbackAttribute)) || paramsInfo.Length > 1 || returnType != typeof(void))
+                    continue;
+
+                var attr = methodInfo.GetCustomAttribute<SubscriberCallbackAttribute>(true);
+
+                if (paramsInfo.Length == 0)
                 {
-                    var attr = methodInfo.GetCustomAttribute<SubscriberCallbackAttribute>(true);
                     var callback = (Action)methodInfo.CreateDelegate(typeof(Action), subscriber);
+                    subscriptionList.Add(new Subscription(subscriber, callback, attr.EventType, attr.Priority));
+                }
+                else if(paramsInfo.Length == 1)
+                {
+                    var delegateParam = Expression.Parameter(typeof(object));
+                    MethodCallExpression methodCall = Expression.Call(Expression.Constant(subscriber), methodInfo, Expression.Convert(delegateParam, paramsInfo[0].ParameterType));
+                    var callback = Expression.Lambda<Action<object>>(methodCall, delegateParam).Compile();
                     subscriptionList.Add(new Subscription(subscriber, callback, attr.EventType, attr.Priority));
                 }
             }

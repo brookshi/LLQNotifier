@@ -33,8 +33,8 @@ namespace Sample
 
         private void MainPage_Loaded(object sender, RoutedEventArgs e)
         {
-            LLQNotifier.Default.Post(new Event1() { Flag = "flag1" });
-            LLQNotifier.Default.Post(new Event2() { Flag = "flag2" });
+            LLQNotifier.Default.Notify(new Event1() { Flag = "flag1" });
+            LLQNotifier.Default.Notify(new Event2() { Flag = "flag2" });
         }
     }
 }

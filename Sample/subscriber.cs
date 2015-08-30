@@ -38,9 +38,9 @@ namespace Sample
         }
 
         [SubscriberCallback(typeof(Event1), 5)]
-        public void Test2()
+        public void Test2(Event1 e)
         {
-            Debug.WriteLine("->>>>>>>>>>subscriber1>>Test2");
+            Debug.WriteLine("->>>>>>>>>>subscriber1>>Test2 @@@@ " + e.Flag);
         }
     }
 

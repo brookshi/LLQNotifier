@@ -33,12 +33,12 @@ namespace LLQ
             }
         }
 
-        public void Post(object eventObj)
+        public void Notify(object eventObj)
         {
             var subscriptionsOfType = _subscriptionDictByType[eventObj.GetType()];
             foreach(var subscription in subscriptionsOfType)
             {
-                subscription.Callback();//TODO:call with param
+                subscription.ExecCallback(eventObj);
             }
         }
     }
