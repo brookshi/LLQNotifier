@@ -27,7 +27,6 @@ namespace LLQ
     {
         private WeakReference _subscriber;
         public object Subscriber { get { return _subscriber.Target; } }
-
         public bool IsSubscriberAlive { get { return _subscriber.IsAlive; } }
 
         private Type _eventType;
@@ -36,8 +35,8 @@ namespace LLQ
         private NotifyPriority _priority;
         public NotifyPriority Priority { get { return _priority; } }
 
-        private Action _callback;
-        public Action<object> _callbackWithParam;
+        private Action<WeakReference> _callback;
+        public Action<WeakReference, object> _callbackWithParam;
 
         public void ExecCallback(object param)
         {
@@ -46,15 +45,15 @@ namespace LLQ
 
             if(_callback != null)
             {
-                _callback();
+                _callback(_subscriber);
             }
             else if(_callbackWithParam != null)
             {
-                _callbackWithParam(param);
+                _callbackWithParam(_subscriber, param);
             }
         }
 
-        public Subscription(object subscriber, Action callback, Type eventType, NotifyPriority priority)
+        public Subscription(object subscriber, Action<WeakReference> callback, Type eventType, NotifyPriority priority)
         {
             _subscriber = new WeakReference(subscriber);
             _callback = callback;
@@ -62,7 +61,7 @@ namespace LLQ
             _eventType = eventType;
         }
 
-        public Subscription(object subscriber, Action<object> callbackWithParam, Type eventType, NotifyPriority priority)
+        public Subscription(object subscriber, Action<WeakReference, object> callbackWithParam, Type eventType, NotifyPriority priority)
         {
             _subscriber = new WeakReference(subscriber);
             _callbackWithParam = callbackWithParam;
@@ -77,6 +76,17 @@ namespace LLQ
                 throw new ArgumentException();
 
             return (int)Priority > (int)subscription.Priority ? -1 : 1;
+        }
+
+        public override bool Equals(object obj)
+        {
+            var subscription = obj as Subscription;
+            return subscription != null && subscription.Subscriber != null && subscription.Subscriber.Equals(Subscriber);
+        }
+
+        public override int GetHashCode()
+        {
+            return Subscriber == null ? -1 : Subscriber.GetHashCode();
         }
     }
 }

@@ -43,14 +43,26 @@ namespace LLQ
 
                 if (paramsInfo.Length == 0)
                 {
-                    var callback = (Action)methodInfo.CreateDelegate(typeof(Action), subscriber);
+                    Action<WeakReference> callback = weakTarget =>
+                    {
+                        if (weakTarget.Target != null)
+                        {
+                            ((Action)methodInfo.CreateDelegate(typeof(Action), weakTarget.Target))();
+                        }
+                    };
                     subscriptionList.Add(new Subscription(subscriber, callback, attr.EventType, attr.Priority));
                 }
                 else if(paramsInfo.Length == 1)
                 {
-                    var delegateParam = Expression.Parameter(typeof(object));
-                    MethodCallExpression methodCall = Expression.Call(Expression.Constant(subscriber), methodInfo, Expression.Convert(delegateParam, paramsInfo[0].ParameterType));
-                    var callback = Expression.Lambda<Action<object>>(methodCall, delegateParam).Compile();
+                    Action<WeakReference, object> callback = (weakTarget, param) =>
+                    {
+                        if (weakTarget.Target != null)
+                        {
+                            var delegateParam = Expression.Parameter(typeof(object));
+                            MethodCallExpression methodCall = Expression.Call(Expression.Constant(weakTarget.Target), methodInfo, Expression.Convert(delegateParam, paramsInfo[0].ParameterType));
+                            Expression.Lambda<Action<object>>(methodCall, delegateParam).Compile()(param);
+                        }
+                    };
                     subscriptionList.Add(new Subscription(subscriber, callback, attr.EventType, attr.Priority));
                 }
             }
