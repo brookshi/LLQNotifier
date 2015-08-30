@@ -22,19 +22,12 @@ using System.Threading.Tasks;
 
 namespace LLQ
 {
-    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
-    public class SubscriberCallbackAttribute : Attribute
+    public enum NotifyPriority
     {
-        const NotifyPriority DEFAULT_PRIORITY = NotifyPriority.Normal;
-
-        public SubscriberCallbackAttribute(Type eventType, NotifyPriority priority = DEFAULT_PRIORITY)
-        {
-            EventType = eventType;
-            Priority = priority;
-        }
-
-        public Type EventType { get; set; }
-
-        public NotifyPriority Priority { get; set; }
+        Lowest = 0,
+        BelowNormal,
+        Normal,
+        AboveNormal,
+        Highest
     }
 }

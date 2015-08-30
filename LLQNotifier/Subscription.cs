@@ -33,8 +33,8 @@ namespace LLQ
         private Type _eventType;
         public Type EventType { get { return _eventType; } }
 
-        private int _priority;
-        public int Priority { get { return _priority; } }
+        private NotifyPriority _priority;
+        public NotifyPriority Priority { get { return _priority; } }
 
         private Action _callback;
         public Action<object> _callbackWithParam;
@@ -54,7 +54,7 @@ namespace LLQ
             }
         }
 
-        public Subscription(object subscriber, Action callback, Type eventType, int priority)
+        public Subscription(object subscriber, Action callback, Type eventType, NotifyPriority priority)
         {
             _subscriber = new WeakReference(subscriber);
             _callback = callback;
@@ -62,7 +62,7 @@ namespace LLQ
             _eventType = eventType;
         }
 
-        public Subscription(object subscriber, Action<object> callbackWithParam, Type eventType, int priority)
+        public Subscription(object subscriber, Action<object> callbackWithParam, Type eventType, NotifyPriority priority)
         {
             _subscriber = new WeakReference(subscriber);
             _callbackWithParam = callbackWithParam;
@@ -76,7 +76,7 @@ namespace LLQ
             if (subscription == null)
                 throw new ArgumentException();
 
-            return Priority > subscription.Priority ? -1 : 1;
+            return (int)Priority > (int)subscription.Priority ? -1 : 1;
         }
     }
 }

@@ -37,7 +37,7 @@ namespace Sample
             Debug.WriteLine("->>>>>>>>>>subscriber1>>Test1");
         }
 
-        [SubscriberCallback(typeof(Event1), 5)]
+        [SubscriberCallback(typeof(Event1), NotifyPriority.Highest)]
         public void Test2(Event1 e)
         {
             Debug.WriteLine("->>>>>>>>>>subscriber1>>Test2 @@@@ " + e.Flag);
@@ -51,13 +51,13 @@ namespace Sample
             LLQNotifier.Default.Register(this);
         }
 
-        [SubscriberCallback(typeof(Event2), 1)]
+        [SubscriberCallback(typeof(Event2), NotifyPriority.Lowest)]
         public void Test3()
         {
             Debug.WriteLine("->>>>>>>>>>subscriber2>>Test3");
         }
 
-        [SubscriberCallback(typeof(Event1), 4)]
+        [SubscriberCallback(typeof(Event1), NotifyPriority.AboveNormal)]
         public void Test4()
         {
             Debug.WriteLine("->>>>>>>>>>subscriber2>>Test4");
