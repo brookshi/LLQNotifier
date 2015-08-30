@@ -31,6 +31,11 @@ namespace Sample
             LLQNotifier.Default.Register(this);
         }
 
+        public void Unregister()
+        {
+            LLQNotifier.Default.Unregister(this);
+        }
+
         [SubscriberCallback(typeof(Event1))]
         public void Test1()
         {
@@ -49,6 +54,11 @@ namespace Sample
         public subscriber2()
         {
             LLQNotifier.Default.Register(this);
+        }
+
+        public void Unregister()
+        {
+            LLQNotifier.Default.Unregister(this);
         }
 
         [SubscriberCallback(typeof(Event2), NotifyPriority.Lowest)]
