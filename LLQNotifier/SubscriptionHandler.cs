@@ -47,7 +47,7 @@ namespace LLQ
                             ((Action)methodInfo.CreateDelegate(typeof(Action), weakTarget.Target))();
                         }
                     };
-                    subscriptionList.Add(new Subscription(subscriber, callback, attr.EventType, attr.Priority));
+                    subscriptionList.Add(new Subscription(subscriber, callback, attr.EventType, attr.Priority, attr.ThreadMode));
                 }
                 else if(paramsInfo.Length == 1)
                 {
@@ -60,7 +60,7 @@ namespace LLQ
                             Expression.Lambda<Action<object>>(methodCall, delegateParam).Compile()(param);
                         }
                     };
-                    subscriptionList.Add(new Subscription(subscriber, callback, attr.EventType, attr.Priority));
+                    subscriptionList.Add(new Subscription(subscriber, callback, attr.EventType, attr.Priority, attr.ThreadMode));
                 }
             }
 

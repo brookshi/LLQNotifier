@@ -21,17 +21,19 @@ namespace LLQ
     public class Subscription : IComparable
     {
         private WeakReference _subscriber;
+        private Action<WeakReference> _callback;
+        private Action<WeakReference, object> _callbackWithParam;
+
         public object Subscriber { get { return _subscriber.Target; } }
+
         public bool IsSubscriberAlive { get { return _subscriber.IsAlive; } }
 
-        private Type _eventType;
-        public Type EventType { get { return _eventType; } }
+        public Type EventType { get; private set; }
 
-        private NotifyPriority _priority;
-        public NotifyPriority Priority { get { return _priority; } }
+        public NotifyPriority Priority { get; private set; }
 
-        private Action<WeakReference> _callback;
-        public Action<WeakReference, object> _callbackWithParam;
+        public ThreadMode ThreadMode { get; private set; }
+
 
         public void ExecCallback(object param)
         {
@@ -48,20 +50,22 @@ namespace LLQ
             }
         }
 
-        public Subscription(object subscriber, Action<WeakReference> callback, Type eventType, NotifyPriority priority)
+        public Subscription(object subscriber, Action<WeakReference> callback, Type eventType, NotifyPriority priority, ThreadMode threadMode)
         {
             _subscriber = new WeakReference(subscriber);
             _callback = callback;
-            _priority = priority;
-            _eventType = eventType;
+            Priority = priority;
+            EventType = eventType;
+            ThreadMode = threadMode;
         }
 
-        public Subscription(object subscriber, Action<WeakReference, object> callbackWithParam, Type eventType, NotifyPriority priority)
+        public Subscription(object subscriber, Action<WeakReference, object> callbackWithParam, Type eventType, NotifyPriority priority, ThreadMode threadMode)
         {
             _subscriber = new WeakReference(subscriber);
             _callbackWithParam = callbackWithParam;
-            _priority = priority;
-            _eventType = eventType;
+            Priority = priority;
+            EventType = eventType;
+            ThreadMode = threadMode;
         }
 
         public int CompareTo(object obj)

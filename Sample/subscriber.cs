@@ -67,7 +67,7 @@ namespace Sample
             Debug.WriteLine("->>>>>>>>>>subscriber2>>Test3");
         }
 
-        [SubscriberCallback(typeof(Event1), NotifyPriority.AboveNormal)]
+        [SubscriberCallback(typeof(Event1), NotifyPriority.AboveNormal, ThreadMode.Current)]
         public void Test4()
         {
             Debug.WriteLine("->>>>>>>>>>subscriber2>>Test4");

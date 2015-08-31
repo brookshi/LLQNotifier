@@ -27,6 +27,7 @@ namespace Sample
         public MainPage()
         {
             this.InitializeComponent();
+            LLQNotifier.Default.Register(this);
             Loaded += MainPage_Loaded;
         }
 
@@ -51,6 +52,12 @@ namespace Sample
             subscriber2.Unregister();
             LLQNotifier.Default.Notify(new Event1() { Flag = "flag1" });
             LLQNotifier.Default.Notify(new Event2() { Flag = "flag2" });
+        }
+
+        [SubscriberCallback(typeof(Event1), NotifyPriority.Normal, ThreadMode.Main)]//cause exception if use ThreadMode.Background
+        public void Test()
+        {
+            txt_display.Text = "test";
         }
     }
 }

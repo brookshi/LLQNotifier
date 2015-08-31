@@ -18,6 +18,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
 namespace LLQ
 {
@@ -95,8 +96,27 @@ namespace LLQ
             {
                 if (subscription.IsSubscriberAlive && _subscriberDictWithType.ContainsKey(subscription.Subscriber))
                 {
-                    subscription.ExecCallback(eventObj);
+                    NotifyDispatcher(subscription, eventObj);
                 }
+            }
+        }
+
+        void NotifyDispatcher(Subscription subscription, object eventObj)
+        {
+            switch(subscription.ThreadMode)
+            {
+                case ThreadMode.Current:
+                    subscription.ExecCallback(eventObj);
+                    return;
+                case ThreadMode.Background:
+                    Task.Run(() => subscription.ExecCallback(eventObj));
+                    return;
+                case ThreadMode.Main:
+                    IProgress<object> progress = new Progress<object>(obj => subscription.ExecCallback(eventObj));
+                    Task.Run(() => { progress.Report(null); });
+                    return;
+                default:
+                    throw new Exception(subscription.ThreadMode.ToString() + " is not supported");
             }
         }
     }

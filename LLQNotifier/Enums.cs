@@ -24,4 +24,11 @@ namespace LLQ
         AboveNormal,
         Highest
     }
+
+    public enum ThreadMode
+    {
+        Current = 0,
+        Main,
+        Background
+    }
 }
