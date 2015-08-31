@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
@@ -27,16 +28,22 @@ namespace Sample
         public MainPage()
         {
             this.InitializeComponent();
+            LLQNotifier.MainDispatcher = this.Dispatcher;
             LLQNotifier.Default.Register(this);
             Loaded += MainPage_Loaded;
         }
 
         private void MainPage_Loaded(object sender, RoutedEventArgs e)
         {
-            Debug.WriteLine("**********Test Normal**********");
             subscriber1 subscriber1 = new subscriber1();
             subscriber2 subscriber2 = new subscriber2();
             WeakReference wr = new WeakReference(subscriber1);
+
+            Debug.WriteLine("**********Test Async**********");
+            Task.Run(() => LLQNotifier.Default.Notify(new Event1() { Flag = "flag1" }));
+            Task.Run(() => LLQNotifier.Default.Notify(new Event2() { Flag = "flag2" }));
+
+            Debug.WriteLine("**********Test Normal**********");
             LLQNotifier.Default.Notify(new Event1() { Flag = "flag1" });
             LLQNotifier.Default.Notify(new Event2() { Flag = "flag2" });
 
@@ -52,9 +59,11 @@ namespace Sample
             subscriber2.Unregister();
             LLQNotifier.Default.Notify(new Event1() { Flag = "flag1" });
             LLQNotifier.Default.Notify(new Event2() { Flag = "flag2" });
+
+            Task.Run(()=> LLQNotifier.Default.Notify(new Event3() { Flag = "flag3" }));
         }
 
-        [SubscriberCallback(typeof(Event1), NotifyPriority.Normal, ThreadMode.Main)]//cause exception if use ThreadMode.Background
+        [SubscriberCallback(typeof(Event3), NotifyPriority.Normal, ThreadMode.Main)]//cause exception if use ThreadMode.Background
         public void Test()
         {
             txt_display.Text = "test";

@@ -17,14 +17,21 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
+using Windows.UI.Core;
 
 namespace LLQ
 {
     public class LLQNotifier
     {
         public readonly static LLQNotifier Default = new LLQNotifier();
+
+        public static CoreDispatcher MainDispatcher { get; set; }
+
+        static SynchronizationContext _syncContext;
 
         private readonly object _lockForSubscribersByType = new object();
 
@@ -38,6 +45,9 @@ namespace LLQ
 
         public void Register(object subscriber)
         {
+            if (_syncContext == null && SynchronizationContext.Current != null)
+                _syncContext = SynchronizationContext.Current;
+
             List<Type> subscriptTypes = new List<Type>();
             if (_subscriberDictWithType.ContainsKey(subscriber))
             {
@@ -112,8 +122,19 @@ namespace LLQ
                     Task.Run(() => subscription.ExecCallback(eventObj));
                     return;
                 case ThreadMode.Main:
-                    IProgress<object> progress = new Progress<object>(obj => subscription.ExecCallback(eventObj));
-                    Task.Run(() => { progress.Report(null); });
+                    if (SynchronizationContext.Current == null)
+                    {
+                        if (MainDispatcher != null)
+                            MainDispatcher.RunAsync(CoreDispatcherPriority.Normal, () => subscription.ExecCallback(eventObj)).AsTask();
+                        else if (_syncContext != null)
+                            _syncContext.Post((a) => subscription.ExecCallback(eventObj), null);
+                        else
+                            throw new Exception("cannot get ui dispatcher");
+                    }
+                    else
+                    {
+                        subscription.ExecCallback(eventObj);
+                    }
                     return;
                 default:
                     throw new Exception(subscription.ThreadMode.ToString() + " is not supported");
