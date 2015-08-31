@@ -7,5 +7,10 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <TextBlock Margin="10, 100, 0,0"  Name="txt_display"  Text=""/>
+    <StackPanel Margin="10, 50, 0,0" Orientation="Vertical">
+        <TextBlock  Name="txt_display"  Text=""/>
+        <Button Content="Test function" Click="FunctionTest"/>
+        <Button Content="Test Performance" Click="PerformanceTest"/>
+        <TextBlock Margin="10, 100, 0,0" Name="rtb"/>
+    </StackPanel>
 </Page>

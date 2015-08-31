@@ -28,12 +28,16 @@ namespace Sample
         public MainPage()
         {
             this.InitializeComponent();
+            rtb.TextWrapping = TextWrapping.Wrap;
             LLQNotifier.MainDispatcher = this.Dispatcher;
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
             LLQNotifier.Default.Register(this);
-            Loaded += MainPage_Loaded;
+            sw.Stop();
+            rtb.Text += "register: " + sw.ElapsedMilliseconds;
         }
 
-        private void MainPage_Loaded(object sender, RoutedEventArgs e)
+        public void FunctionTest(object sender, RoutedEventArgs arg)
         {
             subscriber1 subscriber1 = new subscriber1();
             subscriber2 subscriber2 = new subscriber2();
@@ -60,7 +64,16 @@ namespace Sample
             LLQNotifier.Default.Notify(new Event1() { Flag = "flag1" });
             LLQNotifier.Default.Notify(new Event2() { Flag = "flag2" });
 
-            Task.Run(()=> LLQNotifier.Default.Notify(new Event3() { Flag = "flag3" }));
+            Task.Run(() => LLQNotifier.Default.Notify(new Event3() { Flag = "flag3" }));
+        }
+
+        public void PerformanceTest(object sender, RoutedEventArgs arg)
+        {
+            Stopwatch sw = new Stopwatch();
+            subscriber1 subscriber1 = new subscriber1(sw, ()=> { rtb.Text += "\r\nNotify: " + sw.ElapsedMilliseconds; });
+            sw.Start();
+            LLQNotifier.Default.Notify(new Event4() { Flag = "flag4" });
+            
         }
 
         [SubscriberCallback(typeof(Event3), NotifyPriority.Normal, ThreadMode.Main)]//cause exception if use ThreadMode.Background

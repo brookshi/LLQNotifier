@@ -36,4 +36,9 @@ namespace Sample
     {
         public string Flag { get; set; }
     }
+
+    public class Event4
+    {
+        public string Flag { get; set; }
+    }
 }
