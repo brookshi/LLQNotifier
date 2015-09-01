@@ -14,8 +14,6 @@ using System.Security;
 [assembly: AssemblyCopyright("Copyright © BrookShi 2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
-[assembly: AllowPartiallyTrustedCallers]
-[assembly: SecurityTransparent]
 
 // Version information for an assembly consists of the following four values:
 //

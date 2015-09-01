@@ -17,14 +17,13 @@
 using System;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace LLQ
 {
     public class Subscription : IComparable
     {
         private WeakReference _subscriber;
-        private Action _callback;
-        private Action<WeakReference, object> _callbackWithParam;
 
         public object Subscriber { get { return _subscriber.Target; } }
 
@@ -36,30 +35,41 @@ namespace LLQ
 
         public ThreadMode ThreadMode { get; private set; }
 
+        private ConditionalWeakTable<object, Action> _subscriberMethod = new ConditionalWeakTable<object, Action>();
 
+        private MethodInfo _method;
+        //>>>>>>>>>>it's the slowest
+        /*var target1 = Expression.Property(Expression.Constant(_subscriber), typeof(WeakReference), "Target");
+        var target = Expression.Constant(Subscriber);
+        MethodCallExpression methodCall = Expression.Call(target, method);
+        _callback = Expression.Lambda<Action>(methodCall).Compile();*/
+
+        //>>>>>>>>>>it will keep the object reference
+        //_callback = (Action) method.CreateDelegate(typeof(Action), Subscriber);
+
+        //>>>>>>>>>a bit slower than delegate
+        //_callback = () => method.Invoke(Subscriber, null);
         public Subscription(object subscriber, MethodInfo method, Type eventType, NotifyPriority priority, ThreadMode threadMode)
         {
             _subscriber = new WeakReference(subscriber);
             Priority = priority;
             EventType = eventType;
             ThreadMode = threadMode;
-
-            //var target1 = Expression.Property(Expression.Constant(_subscriber), typeof(WeakReference), "Target");
-            var target = Expression.Convert(Expression.Constant(Subscriber), method.DeclaringType);
-            MethodCallExpression methodCall = Expression.Call(target, method);
-            _callback = Expression.Lambda<Action>(methodCall).Compile();
-
-            //_callback = (Action) method.CreateDelegate(typeof(Action), Subscriber);
-            // _callback = () => method.Invoke(Subscriber, null);
+            InitMethod(subscriber, method);
         }
 
-        public Subscription(object subscriber, Action<WeakReference, object> callbackWithParam, Type eventType, NotifyPriority priority, ThreadMode threadMode)
+        void InitMethod(object subscriber, MethodInfo method)
         {
-            _subscriber = new WeakReference(subscriber);
-            _callbackWithParam = callbackWithParam;
-            Priority = priority;
-            EventType = eventType;
-            ThreadMode = threadMode;
+            var paramsInfo = method.GetParameters();
+
+            if (paramsInfo.Length == 0)
+            {
+                _subscriberMethod.Add(subscriber, (Action)method.CreateDelegate(typeof(Action), subscriber));
+            }
+            else
+            {
+                _method = method;
+            }
         }
 
         public void ExecCallback(object param)
@@ -67,13 +77,14 @@ namespace LLQ
             if (!IsSubscriberAlive || Subscriber == null)
                 return;
 
-            if (_callback != null)
+            Action callback;
+            if (_subscriberMethod.TryGetValue(Subscriber, out callback))
             {
-                _callback();
+                callback();
             }
-            else if (_callbackWithParam != null)
+            else if(_method != null)
             {
-                _callbackWithParam(_subscriber, param);
+                _method.Invoke(Subscriber, new []{ param });
             }
         }
 

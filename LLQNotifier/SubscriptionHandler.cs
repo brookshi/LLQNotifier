@@ -38,30 +38,7 @@ namespace LLQ
 
                 var attr = methodInfo.GetCustomAttribute<SubscriberCallbackAttribute>(true);
 
-                if (paramsInfo.Length == 0)
-                {
-                    Action<WeakReference> callback = weakTarget =>
-                    {
-                        if (weakTarget.Target != null)
-                        {
-                            ((Action)methodInfo.CreateDelegate(typeof(Action), weakTarget.Target))();
-                        }
-                    };
-                    subscriptionList.Add(new Subscription(subscriber, methodInfo, attr.EventType, attr.Priority, attr.ThreadMode));
-                }
-                else if(paramsInfo.Length == 1)
-                {
-                    Action<WeakReference, object> callback = (weakTarget, param) =>
-                    {
-                        if (weakTarget.Target != null)
-                        {
-                            var delegateParam = Expression.Parameter(typeof(object));
-                            MethodCallExpression methodCall = Expression.Call(Expression.Constant(weakTarget.Target), methodInfo, Expression.Convert(delegateParam, paramsInfo[0].ParameterType));
-                            Expression.Lambda<Action<object>>(methodCall, delegateParam).Compile()(param);
-                        }
-                    };
-                    subscriptionList.Add(new Subscription(subscriber, callback, attr.EventType, attr.Priority, attr.ThreadMode));
-                }
+                subscriptionList.Add(new Subscription(subscriber, methodInfo, attr.EventType, attr.Priority, attr.ThreadMode));
             }
 
             return subscriptionList;

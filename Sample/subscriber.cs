@@ -48,9 +48,9 @@ namespace Sample
         }
 
         [SubscriberCallback(typeof(Event1), NotifyPriority.Highest)]
-        public void Test2()
+        public void Test2(Event1 e)
         {
-            Debug.WriteLine("->>>>>>>>>>subscriber1>>Test2 @@@@ ");// + e.Flag);
+            Debug.WriteLine("->>>>>>>>>>subscriber1>>Test2 @@@@ " + e.Flag);
         }
     }
 
@@ -96,4 +96,22 @@ namespace Sample
         {
         }
     }
+
+    public class subscriber5
+    {
+        public subscriber5()
+        {
+            LLQNotifier.Default.Register(this);
+        }
+
+        public void Unregister()
+        {
+            LLQNotifier.Default.Unregister(this);
+        }
+
+        [SubscriberCallback(typeof(Event5))]
+        public void Test5(Event5 e)
+        {
+        }
     }
+}
