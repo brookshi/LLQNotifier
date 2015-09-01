@@ -47,7 +47,7 @@ namespace LLQ
                             ((Action)methodInfo.CreateDelegate(typeof(Action), weakTarget.Target))();
                         }
                     };
-                    subscriptionList.Add(new Subscription(subscriber, callback, attr.EventType, attr.Priority, attr.ThreadMode));
+                    subscriptionList.Add(new Subscription(subscriber, methodInfo, attr.EventType, attr.Priority, attr.ThreadMode));
                 }
                 else if(paramsInfo.Length == 1)
                 {

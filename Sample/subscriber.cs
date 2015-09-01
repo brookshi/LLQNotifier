@@ -31,13 +31,9 @@ namespace Sample
             LLQNotifier.Default.Register(this);
         }
 
-        Stopwatch _sw;
-        Action _callback;
         public subscriber1(Stopwatch sw, Action cb)
         {
             LLQNotifier.Default.Register(this);
-            _sw = sw;
-            _callback = cb;
         }
 
         public void Unregister()
@@ -52,17 +48,9 @@ namespace Sample
         }
 
         [SubscriberCallback(typeof(Event1), NotifyPriority.Highest)]
-        public void Test2(Event1 e)
+        public void Test2()
         {
-            Debug.WriteLine("->>>>>>>>>>subscriber1>>Test2 @@@@ " + e.Flag);
-        }
-
-        [SubscriberCallback(typeof(Event4))]
-        public void Test4()
-        {
-            Debug.WriteLine("->>>>>>>>>>subscriber1>>Test3");
-            _sw.Stop();
-            _callback();
+            Debug.WriteLine("->>>>>>>>>>subscriber1>>Test2 @@@@ ");// + e.Flag);
         }
     }
 
@@ -84,10 +72,28 @@ namespace Sample
             Debug.WriteLine("->>>>>>>>>>subscriber2>>Test3");
         }
 
-        [SubscriberCallback(typeof(Event1), NotifyPriority.AboveNormal, ThreadMode.Current)]
+        [SubscriberCallback(typeof(Event2), NotifyPriority.AboveNormal, ThreadMode.Current)]
         public void Test4()
         {
             Debug.WriteLine("->>>>>>>>>>subscriber2>>Test4");
         }
     }
-}
+
+    public class subscriber4
+    {
+        public subscriber4()
+        {
+            LLQNotifier.Default.Register(this);
+        }
+
+        public void Unregister()
+        {
+            LLQNotifier.Default.Unregister(this);
+        }
+
+        [SubscriberCallback(typeof(Event4))]
+        public void Test4()
+        {
+        }
+    }
+    }

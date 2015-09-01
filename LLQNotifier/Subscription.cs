@@ -15,13 +15,15 @@
 #endregion
 
 using System;
+using System.Linq.Expressions;
+using System.Reflection;
 
 namespace LLQ
 {
     public class Subscription : IComparable
     {
         private WeakReference _subscriber;
-        private Action<WeakReference> _callback;
+        private Action _callback;
         private Action<WeakReference, object> _callbackWithParam;
 
         public object Subscriber { get { return _subscriber.Target; } }
@@ -35,28 +37,20 @@ namespace LLQ
         public ThreadMode ThreadMode { get; private set; }
 
 
-        public void ExecCallback(object param)
-        {
-            if (!IsSubscriberAlive)
-                return;
-
-            if(_callback != null)
-            {
-                _callback(_subscriber);
-            }
-            else if(_callbackWithParam != null)
-            {
-                _callbackWithParam(_subscriber, param);
-            }
-        }
-
-        public Subscription(object subscriber, Action<WeakReference> callback, Type eventType, NotifyPriority priority, ThreadMode threadMode)
+        public Subscription(object subscriber, MethodInfo method, Type eventType, NotifyPriority priority, ThreadMode threadMode)
         {
             _subscriber = new WeakReference(subscriber);
-            _callback = callback;
             Priority = priority;
             EventType = eventType;
             ThreadMode = threadMode;
+
+            //var target1 = Expression.Property(Expression.Constant(_subscriber), typeof(WeakReference), "Target");
+            var target = Expression.Convert(Expression.Constant(Subscriber), method.DeclaringType);
+            MethodCallExpression methodCall = Expression.Call(target, method);
+            _callback = Expression.Lambda<Action>(methodCall).Compile();
+
+            //_callback = (Action) method.CreateDelegate(typeof(Action), Subscriber);
+            // _callback = () => method.Invoke(Subscriber, null);
         }
 
         public Subscription(object subscriber, Action<WeakReference, object> callbackWithParam, Type eventType, NotifyPriority priority, ThreadMode threadMode)
@@ -66,6 +60,21 @@ namespace LLQ
             Priority = priority;
             EventType = eventType;
             ThreadMode = threadMode;
+        }
+
+        public void ExecCallback(object param)
+        {
+            if (!IsSubscriberAlive || Subscriber == null)
+                return;
+
+            if (_callback != null)
+            {
+                _callback();
+            }
+            else if (_callbackWithParam != null)
+            {
+                _callbackWithParam(_subscriber, param);
+            }
         }
 
         public int CompareTo(object obj)

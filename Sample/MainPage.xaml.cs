@@ -39,41 +39,50 @@ namespace Sample
 
         public void FunctionTest(object sender, RoutedEventArgs arg)
         {
+            Function();
+        }
+
+        void Function()
+        {
             subscriber1 subscriber1 = new subscriber1();
             subscriber2 subscriber2 = new subscriber2();
             WeakReference wr = new WeakReference(subscriber1);
 
             Debug.WriteLine("**********Test Async**********");
-            Task.Run(() => LLQNotifier.Default.Notify(new Event1() { Flag = "flag1" }));
-            Task.Run(() => LLQNotifier.Default.Notify(new Event2() { Flag = "flag2" }));
+            Task.Run(() => LLQNotifier.Default.Notify(new Event1() { Flag = "async flag1" }));
+            Task.Run(() => LLQNotifier.Default.Notify(new Event2() { Flag = "async flag2" }));
+            Task.Run(() => LLQNotifier.Default.Notify(new Event3() { Flag = "async flag3" }));
 
             Debug.WriteLine("**********Test Normal**********");
-            LLQNotifier.Default.Notify(new Event1() { Flag = "flag1" });
-            LLQNotifier.Default.Notify(new Event2() { Flag = "flag2" });
+            LLQNotifier.Default.Notify(new Event1() { Flag = "before gc normal flag1" });
+            LLQNotifier.Default.Notify(new Event2() { Flag = "before gc normal flag2" });
 
             Debug.WriteLine("**********Test GC**********");
             subscriber1 = null;
-            Debug.WriteLine(">>>>>>>>>>Before GC>>" + (subscriber1 == null).ToString());
+            Debug.WriteLine(">>>>>>>>>>Before GC>> subscriber1 is null : " +(subscriber1 == null).ToString());
             GC.Collect();
-            Debug.WriteLine(">>>>>>>>>>After GC>>" + wr.IsAlive.ToString());
-            LLQNotifier.Default.Notify(new Event1() { Flag = "flag1" });
-            LLQNotifier.Default.Notify(new Event2() { Flag = "flag2" });
+            Debug.WriteLine(">>>>>>>>>>After GC>>wr is alive : " + wr.IsAlive.ToString());
+            LLQNotifier.Default.Notify(new Event1() { Flag = "after gc normal flag1" });
+            LLQNotifier.Default.Notify(new Event2() { Flag = "after gc normal flag2" });
 
             Debug.WriteLine("**********Test Unregister**********");
             subscriber2.Unregister();
-            LLQNotifier.Default.Notify(new Event1() { Flag = "flag1" });
-            LLQNotifier.Default.Notify(new Event2() { Flag = "flag2" });
-
-            Task.Run(() => LLQNotifier.Default.Notify(new Event3() { Flag = "flag3" }));
+            LLQNotifier.Default.Notify(new Event1() { Flag = "unregister flag1" });
+            LLQNotifier.Default.Notify(new Event2() { Flag = "unregister flag2" });
         }
 
+        subscriber4 subscriber4 = new subscriber4();
         public void PerformanceTest(object sender, RoutedEventArgs arg)
         {
-            Stopwatch sw = new Stopwatch();
-            subscriber1 subscriber1 = new subscriber1(sw, ()=> { rtb.Text += "\r\nNotify: " + sw.ElapsedMilliseconds; });
-            sw.Start();
-            LLQNotifier.Default.Notify(new Event4() { Flag = "flag4" });
-            
+            GC.Collect();
+            var event1 = new Event4() { Flag = "flag4" };
+            var sw = Stopwatch.StartNew();
+            for (int i=0;i<1000000;i++)
+            {
+                LLQNotifier.Default.Notify(event1);
+            }
+            sw.Stop();
+            rtb.Text = "\r\nNotify: " + sw.ElapsedMilliseconds;
         }
 
         [SubscriberCallback(typeof(Event3), NotifyPriority.Normal, ThreadMode.Main)]//cause exception if use ThreadMode.Background

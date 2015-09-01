@@ -56,11 +56,11 @@ namespace LLQ
 
             IList<Subscription> subscriptionList = SubscriptionHandler.CreateSubscription(subscriber);
 
-            foreach(var subscription in subscriptionList)
+            foreach (var subscription in subscriptionList)
             {
                 var subscriptionsOfType = _subscriptionDictByType.GetOrAdd(subscription.EventType, new List<Subscription>());
 
-                lock(_locksForSubscription.GetOrAdd(subscription.EventType, new object()))
+                lock (_locksForSubscription.GetOrAdd(subscription.EventType, new object()))
                 {
                     subscriptionsOfType.Add(subscription);
                     subscriptionsOfType.Sort();
@@ -74,6 +74,8 @@ namespace LLQ
 
             _subscriberDictWithType.Add(subscriber, subscriptTypes);
         }
+
+
 
         public void Unregister(object subscriber)
         {
@@ -101,17 +103,20 @@ namespace LLQ
 
         public void Notify(object eventObj)
         {
+            if (!_subscriptionDictByType.ContainsKey(eventObj.GetType()))
+                return;
+
             var subscriptionsOfType = _subscriptionDictByType[eventObj.GetType()];
             foreach(var subscription in subscriptionsOfType)
             {
                 if (subscription.IsSubscriberAlive && _subscriberDictWithType.ContainsKey(subscription.Subscriber))
                 {
-                    NotifyDispatcher(subscription, eventObj);
+                    DispatchNotification(subscription, eventObj);
                 }
             }
         }
 
-        void NotifyDispatcher(Subscription subscription, object eventObj)
+        void DispatchNotification(Subscription subscription, object eventObj)
         {
             switch(subscription.ThreadMode)
             {
