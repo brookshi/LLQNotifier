@@ -6,7 +6,7 @@ Features
 --------
 - Easy use, 3 step
 - Low coupling, notifier and subscriber are hiden for each other
-- Quick, <10 ms to call method
+- Quick, <1 ms to call method
 - Weak Reference, subscriber are weak reference, so it will be removed after GC
 - Priority control, for the same event, you can set priority for subscribers.
 - Thread Mode, exec callback in main/current/background thread.
