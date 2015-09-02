@@ -1,6 +1,6 @@
 #LLQNotifier
 
-LLQNotifier is notify/subscribe event manager for UWP (Universal Windows Platform)
+LLQNotifier is notify/subscribe event manager for UWP (Universal Windows Platform), like [EventBus](https://github.com/greenrobot/EventBus)
 
 Features
 --------
@@ -52,6 +52,13 @@ public class subscriber
 ``` java
 LLQNotifier.Default.Notify(new Event1() { Flag = "flag" });
 ```
+
+NuGet
+======
+``` java
+PM> Install-Package LLQNotifier 
+```
+
 
 License
 =======
