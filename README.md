@@ -54,14 +54,14 @@ LLQNotifier.Default.Notify(new Event1() { Flag = "flag" });
 ```
 
 NuGet
-======
+--------
 ``` java
 PM> Install-Package LLQNotifier 
 ```
 
 
 License
-=======
+--------
 ``` 
 Copyright 2015 Brook Shi
 
