@@ -15,7 +15,6 @@
 #endregion
 
 using System;
-using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
@@ -38,6 +37,8 @@ namespace LLQ
         private ConditionalWeakTable<object, Action> _subscriberMethod = new ConditionalWeakTable<object, Action>();
 
         private MethodInfo _method;
+
+
         //>>>>>>>>>>it's the slowest
         /*var target1 = Expression.Property(Expression.Constant(_subscriber), typeof(WeakReference), "Target");
         var target = Expression.Constant(Subscriber);
@@ -47,8 +48,9 @@ namespace LLQ
         //>>>>>>>>>>it will keep the object reference
         //_callback = (Action) method.CreateDelegate(typeof(Action), Subscriber);
 
-        //>>>>>>>>>a bit slower than delegate
-        //_callback = () => method.Invoke(Subscriber, null);
+        //>>>>>>>>>30% slower than delegate
+        //_callback = method.Invoke(Subscriber);
+
         public Subscription(object subscriber, MethodInfo method, Type eventType, NotifyPriority priority, ThreadMode threadMode)
         {
             _subscriber = new WeakReference(subscriber);

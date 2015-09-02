@@ -49,9 +49,9 @@ namespace Sample
             WeakReference wr = new WeakReference(subscriber1);
 
             Debug.WriteLine("**********Test Async**********");
-            //Task.Run(() => LLQNotifier.Default.Notify(new Event1() { Flag = "async flag1" }));
-            //Task.Run(() => LLQNotifier.Default.Notify(new Event2() { Flag = "async flag2" }));
-            //Task.Run(() => LLQNotifier.Default.Notify(new Event3() { Flag = "async flag3" }));
+            Task.Run(() => LLQNotifier.Default.Notify(new Event1() { Flag = "async flag1" }));
+            Task.Run(() => LLQNotifier.Default.Notify(new Event2() { Flag = "async flag2" }));
+            Task.Run(() => LLQNotifier.Default.Notify(new Event3() { Flag = "async flag3" }));
 
             Debug.WriteLine("**********Test Normal**********");
             LLQNotifier.Default.Notify(new Event1() { Flag = "before gc normal flag1" });
@@ -78,7 +78,7 @@ namespace Sample
             GC.Collect();
             var event4 = new Event4() { Flag = "flag4" };
             var sw = Stopwatch.StartNew();
-            //for (int i=0;i<100000;i++)
+            for (int i=0;i<100000;i++)
             {
                 LLQNotifier.Default.Notify(event4);
                 //subscriber4.Test4();
@@ -89,7 +89,7 @@ namespace Sample
             GC.Collect();
             var event5 = new Event5() { Flag = "flag5" };
             sw = Stopwatch.StartNew();
-            //for (int i = 0; i < 100000; i++)
+            for (int i = 0; i < 100000; i++)
             {
                 LLQNotifier.Default.Notify(event5);
                 //subscriber5.Test5(event5);
