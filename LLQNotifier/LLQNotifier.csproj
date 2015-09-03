@@ -120,7 +120,10 @@
     <Compile Include="Subscription.cs" />
     <Compile Include="SubscriberCallbackAttribute.cs" />
     <Compile Include="SubscriptionHandler.cs" />
-    <Content Include="Properties\LLQNotifier.rd.xml" />
+    <Content Include="Properties\LLQNotifier.rd.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
+    </Content>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
