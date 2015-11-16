@@ -25,7 +25,7 @@ namespace LLQ
         {
             IList<Subscription> subscriptionList = new List<Subscription>();
 
-            var methodInfos = subscriber.GetType().GetMethods();
+            var methodInfos = subscriber.GetType().GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static);
             foreach (var methodInfo in methodInfos)
             {
                 var paramsInfo = methodInfo.GetParameters();
