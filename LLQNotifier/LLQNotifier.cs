@@ -50,7 +50,7 @@ namespace LLQ
             List<Type> subscriptTypes = new List<Type>();
             if (_subscriberDictWithType.ContainsKey(subscriber))
             {
-                throw new ArgumentException("subscriber had been registed");
+                return;
             }
 
             IList<Subscription> subscriptionList = SubscriptionHandler.CreateSubscription(subscriber);

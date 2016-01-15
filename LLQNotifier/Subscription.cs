@@ -39,7 +39,7 @@ namespace LLQ
         private MethodInfo _method;
 
 
-        //>>>>>>>>>>it's the slowest
+        //>>>>>>>>>>the slowest
         /*var target1 = Expression.Property(Expression.Constant(_subscriber), typeof(WeakReference), "Target");
         var target = Expression.Constant(Subscriber);
         MethodCallExpression methodCall = Expression.Call(target, method);
