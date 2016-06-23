@@ -21,6 +21,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.UI.Core;
+using System.Linq;
 
 namespace LLQ
 {
@@ -106,7 +107,13 @@ namespace LLQ
                 return;
 
             var subscriptionsOfType = _subscriptionDictByType[eventObj.GetType()];
-            foreach(var subscription in subscriptionsOfType)
+            List<Subscription> subList;
+            lock (_locksForSubscription.GetOrAdd(eventObj.GetType(), new object()))
+            {
+                subList = subscriptionsOfType.ToList();
+            }
+
+            foreach (var subscription in subList)
             {
                 if (subscription.IsSubscriberAlive && _subscriberDictWithType.ContainsKey(subscription.Subscriber))
                 {
