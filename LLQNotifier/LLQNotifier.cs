@@ -33,11 +33,9 @@ namespace LLQ
 
         static SynchronizationContext _syncContext;
 
-        private readonly object _lockForSubscribersByType = new object();
+        private readonly object _lockForSubscribersWithType = new object();
 
         private readonly ConcurrentDictionary<Type, object> _locksForSubscription = new ConcurrentDictionary<Type, object>();
-
-        private readonly object _lockForSubscribersList = new object();
 
         private ConcurrentDictionary<Type, List<Subscription>> _subscriptionDictByType = new ConcurrentDictionary<Type, List<Subscription>>();
 
@@ -87,6 +85,7 @@ namespace LLQ
                     RemoveSubscription(type, subscriber);
                 }
             }
+            _subscriberDictWithType.Remove(subscriber);
         }
 
         void RemoveSubscription(Type eventType, object subscriber)
